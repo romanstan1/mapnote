@@ -1,0 +1,33 @@
+@import "src/style/_variables";
+
+
+div.header {
+  border-bottom: 1px solid $grey03;
+  margin: 0 2%;
+  padding: 10px 5%;
+}
+
+div.Login {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 0 5%;
+  height: 70%;
+  justify-content: center;
+  align-items: center;
+  h1 {
+    font-size: 40px;
+    // font-weight: 700;
+  }
+  h2 {
+     font-weight: 300;
+     max-width: 700px;
+     line-height: 145%;
+  }
+  div.button-wrap {
+    margin-top: 30px;
+    > p {
+      padding-bottom:10px;
+    }
+  }
+}

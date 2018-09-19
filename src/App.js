@@ -1,7 +1,7 @@
 import React, { Component, Fragment} from 'react';
 import {Route,Switch} from 'react-router-dom'
-import Home from './components/Home'
-import './style/index.css';
+import Home from './features'
+import './style/global.css';
 
 class App extends Component {
   render() {

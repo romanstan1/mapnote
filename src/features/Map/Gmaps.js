@@ -34,7 +34,7 @@ class Gmaps extends Component {
     return (
       <div style={{ height: '100vh', width: '100%', position: 'relative' }}>
         <GoogleMapReact
-          bootstrapURLKeys={{ key: }}
+          bootstrapURLKeys={{ key: process.env.REACT_APP_MAPNOTE_GMAPS}}
           defaultCenter={this.props.center}
           defaultZoom={this.props.zoom}
           options={{

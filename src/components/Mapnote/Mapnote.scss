@@ -1,0 +1,21 @@
+@import "src/style/_variables";
+
+div.Mapnote {
+  display: flex;
+  h1 {
+    margin: 0;
+    padding: 0;
+    line-height: 42px;
+    font-size: 22px;
+    font-weight: 300;
+    color: $brightblue;
+  }
+  svg {
+    padding: 5px 0 7px;
+    height: 32px;
+    width: 42px;
+    fill: $brightblue;
+    stroke: $brightblue;
+    stroke-width: 3px;
+  }
+}

@@ -1,0 +1,31 @@
+@import "src/style/_variables";
+
+div.button {
+  background: $grey03;
+  display:inline-flex;
+  padding: 8px 12px;
+  color: black;
+  border-radius: 5px;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease-in;
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+  }
+  p {
+    margin: 0 14px;
+    line-height: 24px;
+  }
+  &.primary {
+    background: $brightblue;
+    color: white;
+    &:hover {
+      background: $yankeeBlue;
+    }
+  }
+  &.secondary {
+    background: green;
+  }
+}

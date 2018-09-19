@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700');
+@import "src/style/_variables";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; overflow: hidden;
+}
+
+body {
+  font-family: 'Ubuntu', sans-serif;
+  color: $yankeeBlue;
+  background: $offWhite;
+}
+
+
+div#root {
+  height: 100%;
+}

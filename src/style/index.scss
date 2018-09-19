@@ -1,87 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700');
+
 html, body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   height: 100%; overflow: hidden
-}
-
-nav {
-  position: absolute;
-  top:0;
-  right: 0;
-  width: 200px;
-  height: 30px;
-  line-height: 30px;
-  z-index: 100;
-  a {
-    margin: 0 10px;
-    text-decoration: none;
-    font-size: 10px;
-    color: white;
-    opacity: 0.3;
-    text-transform: uppercase;
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-}
-
-div.Home {
-  position: relative;
-  height: 100vh;
-  background: #0e1625;
-  // background: radial-gradient(closest-side, #0e1625, #424347, #0e1625);
-  > svg {
-    path.graticule {
-    }
-    path {
-    }
-  }
-  div.input-location {
-    z-index: 10;
-    position: absolute;
-    margin-top: 50px;
-    bottom: 35px;
-    left: 35px;
-    > div {
-      display: inline-block;
-      height: 30px;
-      label {
-        width: 30px;
-        display: inline-block;
-        text-align: right;
-        font-size: 14px;
-      }
-      input {
-        width: 80px;
-        line-height: 20px;
-        outline: none;
-        text-indent: 5px;
-        margin: 5px;
-      }
-    }
-    div.add-location {
-      margin-left: 10px;
-      margin-top: 0px;
-      text-align: center;
-      width: 80px;
-      height: 25px;
-      line-height: 25px;
-      text-transform: uppercase;
-      font-size: 13px;
-      color: white;
-      background: navy;
-      cursor: pointer;
-      z-index: 10;
-      &:hover {
-        opacity: 0.8;
-      }
-    }
-  }
-}
-
-iframe {
-  cursor: crosshair !important;
 }
 
 div.HomeMarker {
@@ -147,8 +70,6 @@ div.LocationMarker {
     opacity: 0.0
   }
 }
-
-
 
 img[src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5_hdpi.png"], div.gmnoprint, div.gm-style-cc, button.gm-fullscreen-control{
     display: none;
