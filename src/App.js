@@ -1,6 +1,6 @@
 import React, { Component, Fragment} from 'react';
 import {Route,Switch} from 'react-router-dom'
-import Home from './features'
+import Home from './features/Home'
 import './style/global.css';
 
 class App extends Component {

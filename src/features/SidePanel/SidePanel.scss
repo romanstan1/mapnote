@@ -1,0 +1,7 @@
+@import "src/style/_variables";
+
+div.SidePanel {
+  width: 300px;
+  background: $grey03;
+  border-right: 2px solid blue;
+}

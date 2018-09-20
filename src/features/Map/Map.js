@@ -1,32 +1,70 @@
-import React, { Component, PureComponent } from 'react';
-import {init, drawMarkers} from './d3-module.js'
-import Scene from './Scene'
-import InputLocation from './InputLocation'
+import React, {Component, Fragment} from 'react'
+import GoogleMapReact from 'google-map-react';
+import styles from './gmaps-style'
 import {connect} from 'react-redux'
 import {addNote} from 'store/modules/action-creators'
 
-class Map extends Component {
-  componentDidMount() {
-    init()
-    // drawMarkers(nextProps.notes)
+const HomeMarker = ({ text }) =>
+<div className="HomeMarker">
+  <div className="ringring"></div>
+  <div className="circle"></div>
+</div>
+
+const LocationMarker = () =>
+<div className="LocationMarker">
+  <div className="ringring"></div>
+  <div className="circle"></div>
+</div>
+
+class Gmaps extends Component {
+
+  static defaultProps = {
+    center: {
+      lat: 51.507256,
+      lng: -0.070512
+    },
+    zoom: 11
   }
-  componentWillReceiveProps(nextProps) {
-    drawMarkers(nextProps.notes)
+
+  handleClick = ({ x, y, lat, lng, event }) => {
+    this.props.dispatch(addNote(lat, lng))
   }
-  handleAdd = (latitude, longitude) => {
-    this.props.dispatch(addNote(latitude, longitude))
-    // drawMarkers(this.props.notes)
-  }
+
   render() {
     return (
-      <div className="Home">
-        <Scene/>
-        <InputLocation handleAdd={this.handleAdd}/>
+      <div style={{ height: '100vh', width: '100%', position: 'relative' }}>
+        <GoogleMapReact
+          bootstrapURLKeys={{ key: process.env.REACT_APP_MAPNOTE_GMAPS}}
+          defaultCenter={this.props.center}
+          defaultZoom={this.props.zoom}
+          options={{
+            styles
+          }}
+
+          onClick={this.handleClick}
+        >
+          <HomeMarker
+            lat={ 51.507256 }
+            lng={ -0.070512 }
+            text={' Marker '}
+          />
+          {
+            this.props.notes.map((note, i) =>
+              <LocationMarker
+                key={i + note.latitude + note.longitude }
+                lat={ note.latitude }
+                lng={ note.longitude }
+              />
+            )
+          }
+        </GoogleMapReact>
       </div>
     )
   }
 }
 
+
+
 export default connect(state => ({
   notes: state.data.notes
-}))(Map)
+}))(Gmaps)

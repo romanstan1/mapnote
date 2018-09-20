@@ -1,2 +1,4 @@
 
 export const ADD_NOTE = 'ADD_NOTE'
+export const LOGGED_IN_SUCCESSFULLY = 'LOGGED_IN_SUCCESSFULLY'
+export const NOT_LOGGED_IN = 'NOT_LOGGED_IN'
