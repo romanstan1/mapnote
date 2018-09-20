@@ -7,12 +7,8 @@ import {checkIfLoggedIn} from 'store/modules/action-creators'
 import './Home.css'
 
 const Loading = () =>
-<div className="spinner">
-  <div></div>
-  <div></div>
-  <div></div>
-  <div></div>
-</div>
+<div className="loader"></div>
+
 
 class Home extends Component {
   componentDidMount() {

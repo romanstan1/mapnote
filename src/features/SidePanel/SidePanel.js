@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux'
+import UserInfo from './UserInfo'
 import './SidePanel.css'
 
-export default class SidePanel extends Component {
-  render() {
-    return (
-      <div className="SidePanel">
-        Side Panel
-      </div>
-    )
-  }
+const SidePanel = ({user}) => {
+  return <div className="SidePanel">
+    <UserInfo/>
+    Side Panel
+  </div>
 }
+
+
+const mapDispatchToProps = (dispatch) => ({
+  // checkIfLoggedIn: () => checkIfLoggedIn(dispatch)
+})
+const mapStateToProps = state => ({
+  user: state.data.user
+})
+
+export default connect(mapStateToProps)(SidePanel)

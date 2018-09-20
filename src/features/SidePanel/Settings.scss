@@ -1,0 +1,45 @@
+@import "src/style/_variables";
+
+div.Settings {
+  // width: 100%;
+  border-bottom: 1px solid $yankeeBlue;
+  height: 35px;
+  display: flex;
+  justify-content:flex-end;
+  align-items: center;
+  padding: 0 1%;
+  > span {
+    cursor: pointer;
+    width: 50px;
+    display: inline-block;
+    height: 25px;
+    position: relative;
+    span {
+      position: absolute;
+      width: 0;
+      height: 0;
+      right: 10px;
+      top: 6px;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 8px solid $yankeeBlue;
+      opacity: 0;
+      transition: 0.2s ease-out;
+    }
+    &:hover {
+      span {
+        opacity: 0.9;
+      }
+      svg {
+        transform: translate(5px, -1px) rotate(-45deg);
+      }
+    }
+
+    svg {
+      height: 25px;
+      transform: translate(8px, -1px) rotate(5deg);;
+      fill: $yankeeBlue;
+      transition: 0.2s ease-out;
+    }
+  }
+}
