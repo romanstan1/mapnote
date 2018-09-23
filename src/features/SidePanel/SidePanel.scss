@@ -5,4 +5,10 @@ div.SidePanel {
   min-width: 300px;
   background: $grey03;
   border-right: 3px solid $grey02;
+  height: 100vh;
+  overflow-y: scroll;
+  div.UserNote {
+    margin: 10px 0;
+    background: white;
+  }
 }

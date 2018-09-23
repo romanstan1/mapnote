@@ -1,4 +1,4 @@
-import {ADD_NOTE, LOGGED_IN_SUCCESSFULLY, NOT_LOGGED_IN} from './actions'
+import {LOGGED_IN_SUCCESSFULLY, NOT_LOGGED_IN, RECEIVED_NOTES} from './actions'
 
 export const initialState = {
   notes: [],
@@ -8,10 +8,10 @@ export const initialState = {
 
 export default (state=initialState, action) => {
   switch(action.type){
-    case ADD_NOTE: {
+    case RECEIVED_NOTES: {
       return {
         ...state,
-        notes: [...state.notes, action.payload]
+        notes: Object.entries(action.payload)
       }
     }
     case LOGGED_IN_SUCCESSFULLY: {

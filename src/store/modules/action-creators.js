@@ -3,7 +3,7 @@ import {
   ADD_NOTE,
   LOGGED_IN_SUCCESSFULLY,
   NOT_LOGGED_IN,
-  RECEIVE_NOTES,
+  RECEIVED_NOTES,
   FAILED_UPLOAD,
   SUCCESSFUL_UPLOAD
 } from './actions'
@@ -15,14 +15,18 @@ export const addNote = (latitude, longitude) => dispatch => {
   })
 }
 
-export const uploadNote = (dispatch, title, description, link, nextPostValue) => {
-  const id = database.ref().child('posts').push().key
+export const uploadNote = (userId, lat, lng) => (dispatch) => {
+  const noteId = database.ref().child('users').push().key
   const updates = {};
-  updates['/posts/' + id] = {
-    title, description, link, id,
-    display: true,
-    date: new Date().toString().slice(4,15),
-    order: nextPostValue
+  updates[userId +'/' + noteId] = {
+    leftByUserId: userId,
+    noteId,
+    title: 'Title of note',
+    content: 'Content of note',
+    hiddenContent: 'Hidden Content',
+    views: [],
+    lat, lng,
+    date: new Date().toString()
   }
   database.ref().update(updates, (error) => {
     if(error) {
@@ -37,22 +41,17 @@ export const uploadNote = (dispatch, title, description, link, nextPostValue) =>
   })
 }
 
-
-export const fetchPosts = (dispatch) => {
-  database.ref('posts/').on('value', snapshot => {
-    const posts =  snapshot.val()
+export const fetchAllNotes = (dispatch) => {
+  database.ref('/').on('value', snapshot => {
+    const notes =  snapshot.val()
+    console.log('notes', notes)
     dispatch({
-      type: RECEIVE_NOTES,
-      payload: posts? Object.keys(posts).map(e => posts[e]) : []
+      type: RECEIVED_NOTES,
+      // payload: posts? Object.keys(posts).map(e => posts[e]) : []
+      payload: notes
     })
   })
 }
-
-
-
-
-
-
 
 export const logIn = () => (dispatch, getState) => {
   auth.setPersistence(persistance.SESSION).then(() =>
@@ -74,7 +73,7 @@ export const checkIfLoggedIn =  async (dispatch) => {
   const delay = time => new Promise(res => setTimeout(()=>res(),time))
   const getAuthState = () => new Promise(res => auth.onAuthStateChanged(user => res(user)))
 
-  const delayedPromise = delay(0)
+  const delayedPromise = delay(0) // UPDATE THIS TO at least 1000
   const authPromise = getAuthState()
 
   await delayedPromise

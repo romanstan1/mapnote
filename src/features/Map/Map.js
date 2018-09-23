@@ -5,6 +5,7 @@ import {connect} from 'react-redux'
 import {addNote} from 'store/modules/action-creators'
 import './Map.css'
 import * as d3 from 'd3'
+import {uploadNote, fetchAllNotes} from 'store/modules/action-creators'
 // import GoogleMapsLoader from 'google-maps';
 const {google, MarkerClusterer} = window
 
@@ -167,10 +168,18 @@ class Gmaps extends Component {
     // map.setCenter(marker.getPosition());
     })
 
+    this.props.fetchAllNotes()
+  }
+
+  componentDidRecieveProps(nextProps) {
+    console.log('did recived props', nextProps)
   }
 
   openModal = (marker) => {
-    console.log('openModal', marker, marker.position.lat())
+    const lat = marker.position.lat()
+    const lng = marker.position.lng()
+    // const {uid} = this.props.user
+    // this.props.uploadNote(uid ,lat, lng)
   }
 
   handleClick = ({ x, y, lat, lng, event }) => {
@@ -180,6 +189,7 @@ class Gmaps extends Component {
 
   render() {
     const {notes} = this.props
+    console.log('redner', notes)
     return (
       <div ref='mapRef' style={{ height: '100vh', width: '100%', position: 'relative' }}>
       </div>
@@ -187,6 +197,14 @@ class Gmaps extends Component {
   }
 }
 
-export default connect(state => ({
+
+const mapStateToProps = state => ({
+  user: state.data.user,
   notes: state.data.notes
-}))(Gmaps)
+})
+const mapDispatchToProps = dispatch => ({
+  uploadNote: (uid,lat, lng) => uploadNote(uid,lat, lng)(dispatch),
+  fetchAllNotes: () => fetchAllNotes(dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Gmaps)
