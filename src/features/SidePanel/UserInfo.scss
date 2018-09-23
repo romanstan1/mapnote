@@ -1,9 +1,31 @@
 @import "src/style/_variables";
 
+div.UserInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: $grey04;
+  padding: 30px 0 20px 0;
+  div.image-wrap {
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    img {
+      height: 100%;
+      // height: 100px;
+    }
+  }
+  div.display-name {
+    margin: 20px 0;
+    font-size: 17px;
+  }
+}
+
 div.Settings {
   // width: 100%;
-  border-bottom: 1px solid $yankeeBlue;
-  height: 35px;
+  // border-bottom: 1px solid $yankeeBlue;
+  height: 40px;
   display: flex;
   justify-content:flex-end;
   align-items: center;
@@ -19,7 +41,7 @@ div.Settings {
       width: 0;
       height: 0;
       right: 10px;
-      top: 6px;
+      top: 5px;
       border-top: 7px solid transparent;
       border-bottom: 7px solid transparent;
       border-left: 8px solid $yankeeBlue;

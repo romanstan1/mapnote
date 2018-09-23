@@ -1,0 +1,93 @@
+@import "src/style/_variables";
+
+div.HomeMarker {
+  position: relative;
+  transform: translate(-50%, -50%);
+  // background: red;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  z-index: 1000;
+  .circle {
+    width: 14px;
+    height: 14px;
+    background-color: #e0f8ff;
+    border-radius: 50%;
+    position: absolute;
+    opacity: 0.9;
+    top: 0;
+    left: 0;
+  }
+
+  .ringring {
+    border: 3px solid  #e0f8ff;
+    -webkit-border-radius: 30px;
+    height: 28px;
+    width: 28px;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    left: -10px;
+    top: -10px;
+    -webkit-animation: pulsate 1.5s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    opacity: 0.0
+  }
+}
+div.LocationMarker {
+  position: relative;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  z-index: 1000;
+  .circle {
+    width: 12px;
+    height: 12px;
+    background-color: #72ffd7;
+    border-radius: 50%;
+    position: absolute;
+    opacity: 0.8;
+    top: 0;
+    left: 0;
+  }
+
+  .ringring {
+    border: 2px solid  #72ffd7;
+    -webkit-border-radius: 30px;
+    height: 20px;
+    width: 20px;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    left: -6px;
+    top: -6px;
+    -webkit-animation: pulsate 1.5s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    opacity: 0.0
+  }
+}
+
+
+.stations, .stations svg {
+  position: absolute;
+}
+
+.stations svg {
+  font: 10px sans-serif;
+}
+
+.stations circle {
+  fill: $brightblue;
+  stroke: $brightblue;
+  stroke-width: 5px;
+}
+
+.stations text { fill: #fff; }
+
+img[src="https://maps.gstatic.com/mapfiles/api-3/images/google_white5_hdpi.png"], div.gmnoprint, div.gm-style-cc, button.gm-fullscreen-control{
+    display: none;
+}
+@-webkit-keyframes pulsate {
+    // 0% {-webkit-transform: scale(0.1, 0.1); opacity: 0.0;}
+    // 50% {opacity: 1.0;}
+    // 100% {-webkit-transform: scale(1.03, 1.03); opacity: 0.0;}
+}

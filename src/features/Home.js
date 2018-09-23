@@ -6,9 +6,7 @@ import {connect} from 'react-redux'
 import {checkIfLoggedIn} from 'store/modules/action-creators'
 import './Home.css'
 
-const Loading = () =>
-<div className="loader"></div>
-
+const Loading = () => <div className="loader"></div>
 
 class Home extends Component {
   componentDidMount() {

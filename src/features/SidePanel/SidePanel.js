@@ -4,10 +4,11 @@ import UserInfo from './UserInfo'
 import './SidePanel.css'
 
 const SidePanel = ({user}) => {
-  return <div className="SidePanel">
-    <UserInfo/>
-    Side Panel
-  </div>
+  return (
+    <div className="SidePanel">
+      <UserInfo/>
+    </div>  
+  )
 }
 
 

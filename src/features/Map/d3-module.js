@@ -1,139 +1,197 @@
 import * as d3 from 'd3'
-import * as d3_queue from 'd3-queue'
-import * as topojson from 'topojson'
 
-const width = window.innerWidth
-const height = window.innerHeight
-// const width = 600
-// const height = 500
-const config = {
-  speed: 0.0,
-  verticalTilt: -30,
-  horizontalTilt: 0
-}
-// let locations = []
-let svg, markerGroup
+const google = window.google
 
-let projection, initialScale, path, center, locations
+var cur_zoom = 7,
+prev_zoom = cur_zoom;
 
-let london = [-0.118667702475932, 51.5019405883275];
 
-let lineToLondon
+// Load the station data. When the data comes back, create an overlay.
+var map = new google.maps.Map(d3.select("#map").node(), {
+zoom: cur_zoom,
+center: new google.maps.LatLng(30.331227, -97.725019),
+'styles': styles,
+//mapTypeId: google.maps.MapTypeId.TERRAIN,
+maxZoom: 12,
+minZoom: 5
+});
 
-export function init() {
-    svg = d3.select('svg').attr('width', width).attr('height', height)
-    markerGroup = svg.append('g')
-    projection = d3.geoOrthographic()
-    // .scale(245)
-     // .rotate([0, 0])
-     .translate([width / 2, (height / 2) - 20])
-     // .clipAngle(90)
+//test data file
+file = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/125707/clusters.json';
+//file = 'clusters.json';
 
-    initialScale = projection.scale()
-    path = d3.geoPath().projection(projection)
-    center = [width/2, height/2]
+//function to caculate dist btw points. Args in format [x, y]
+function coords_dist( point1, point2 ) {
+    var xs = 0;
+    var ys = 0;
 
-    drawGlobe()
-    drawGraticule()
-    enableRotation()
+    xs = point2[0] - point1[0];
+    xs = xs * xs;
 
+    ys = point2[1] - point1[1];
+    ys = ys * ys;
+
+    return Math.sqrt( xs + ys );
 }
 
-function drawGlobe() {
-    d3_queue.queue()
-    .defer(d3.json, 'world.json')
-    .await((error, worldData) => {
-        svg.selectAll(".segment")
-        .data(topojson.feature(worldData, worldData.objects.countries).features)
-        .enter().append("path")
-        .attr("class", "segment")
-        .attr("d", path )
-        .style("stroke", "#2f6674")
-        .style("stroke-width", "1px")
-        .style("fill", (d, i) => '#073e57')
-        // .style("opacity", ".9");
-    })
-}
+d3.json(file, function(error, data) {
+    if (error) return console.warn(error);
 
-var zoom = d3.zoom()
-	.scaleExtent([0.75, 50]) //bound zoom
-	.on("zoom", zoomed);
+    //save full cluster data, then get
+    var clusters = data,
+        data = clusters[cur_zoom];
 
-function drawGraticule() {
-    const graticule = d3.geoGraticule().step([10, 10])
+    var overlay = new google.maps.OverlayView();
 
-    svg.append("path")
-        .datum(graticule)
-        .attr("class", "graticule")
-        .attr("d", path)
-        .style("fill", "#011626")
-        .style("stroke", "#083038");
-}
+    //set bounds based on data's max lat and long
+    var latmax = d3.max(data, function(d){ return d.latitude }),
+        latmin = d3.min(data, function(d){ return d.latitude }),
+        longmax = d3.max(data, function(d){ return d.longitude }),
+        longmin = d3.min(data, function(d){ return d.longitude }),
+        southWest = new google.maps.LatLng(latmin, longmin),
+        northEast = new google.maps.LatLng(latmax, longmax),
+        new_bounds = new google.maps.LatLngBounds(southWest, northEast);
 
-var scl = Math.min(width, height)/2;
+    // map marker radius to values between 6px and 20px
+    var marker_radius = d3.scale.linear()
+      .domain( d3.extent(data, function(d) { return d.size; }) )
+      .range([8, 16]);
 
-function zoomed() {
-  projection.scale(d3.event.transform.translate(projection).k * scl)
-  svg.selectAll("path").attr("d", path)
-  if(!!locations) drawMarkers()
-}
+// Add the container when the overlay is added to the map.
+overlay.onAdd = function() {
+  //map.fitBounds(new_bounds);
+  var layer = d3.select(this.getPanes().overlayMouseTarget).append("div")
+      .attr("class", "stations");
 
-function enableRotation() {
-    const sens = 0.25
+  // Draw each marker as a separate SVG element.
+  // We could use a single SVG, but what size would it have?
+  overlay.draw = function() {
+    prev_zoom = cur_zoom;
+    cur_zoom = map.getZoom();
 
-    svg
-    .call(d3.drag()
-     .subject(function() { var r = projection.rotate(); return {x: r[0] / sens, y: -r[1] / sens}; })
-     .on("drag", function() {
-       var rotate = projection.rotate();
-       projection.rotate([d3.event.x * sens, -d3.event.y * sens, rotate[2]]);
-       svg.selectAll("path").attr("d", path)
-       // svg.selectAll(".focused").classed("focused", focused = false);
-       if(!!locations) drawMarkers()
-     }))
-     .call(zoom)
-     // projection.rotate([config.speed * 1 - 120, config.verticalTilt, config.horizontalTilt])
-}
+    console.log("zoom is " + cur_zoom + ", prev zoom is " + prev_zoom);
+    data = clusters[cur_zoom];
 
-export function drawMarkers(locationData) {
-    lineToLondon = (r) => {
-        return path({"type": "LineString", "coordinates": [london, [r.longitude, r.latitude] ]});
+    var projection = this.getProjection(),
+        padding = 10;
+
+    var marker = layer.selectAll("svg")
+        //.data(d3.values(data))
+        .data(data, function(d) { return d3.values(d); })
+        .each(display); // update existing markers
+
+    // add new markers, with some custom transitions
+    marker.enter().append("svg:svg")
+        .each(display)
+        .attr("width", function(d) { return marker_radius(d.size)*2 + padding*2 })
+        .attr("height", function(d) { return marker_radius(d.size)*2 + padding*2 })
+        .attr("class", "marker")
+        .style("margin-top", function(d) {return "-" + (marker_radius(d.size) + padding)/2 + "px"; })
+        .style("margin-left", function(d) {return "-" + (marker_radius(d.size) + padding)/2 + "px"; })
+        .each(animateIn);
+
+    // remove markers, add some exit transitions later
+    marker.exit()
+          .each(display)
+          .each(animateOut);
+
+    // Add a circle.
+    marker.append("svg:circle")
+        .attr("r", function(d) { return marker_radius(d.size); })
+        .attr("cx", function(d) { return marker_radius(d.size) + padding })
+        .attr("cy", function(d) { return marker_radius(d.size) + padding });
+
+    // Add a label in the center of the circle
+    marker.append("svg:text")
+        .attr("x", function(d) { return marker_radius(d.size) + padding })
+        .attr("y", function(d) { return marker_radius(d.size) + padding })
+        .style("text-anchor", "middle")
+        .attr("dy", ".31em")
+        .text(function(d) { return d.size; });
+
+    function display(d) {
+      var pos = map_pixel(d.latitude, d.longitude);
+
+      return d3.select(this)
+          .style("left", (pos.x - padding) + "px")
+          .style("top", (pos.y - padding) + "px");
     }
-    if(!!locationData) locations = locationData
-    const markers = markerGroup.selectAll('circle').data(locations)
-    markers
-        .enter()
-        .append('circle')
-        .merge(markers)
-        .attr('cx', d => projection([d.longitude, d.latitude])[0])
-        .attr('cy', d => projection([d.longitude, d.latitude])[1])
-        .attr('fill', d => {
-            const coordinate = [d.longitude, d.latitude]
-            const gdistance = d3.geoDistance(coordinate, projection.invert(center))
-            return gdistance > 1.52 ? 'none' : '#003bff'
-        })
-        .attr('r', d => {
-            const coordinate = [d.longitude, d.latitude]
-            const gdistance = d3.geoDistance(coordinate, projection.invert(center))
-            const size = 8 - Math.pow(gdistance, 4)
-            return size
-        })
-        .attr("d", (d) => lineToLondon(d))
 
-    svg
-        .append("g")
-        .attr("class","lines")
-        .selectAll(".lines")
-        .data(locations)
-        .enter()
-        .append("path")
-        .attr("class", "lines")
-        .style("stroke", "#a8217d")
-        .style("stroke-width", "1px")
-        .attr("fill", "none")
-        .attr("d", d => lineToLondon(d))
+    function map_pixel(lat, long) {
+      var pos = new google.maps.LatLng(lat, long);
+      pos = projection.fromLatLngToDivPixel(pos);
 
-    markerGroup.each(function () {
-        this.parentNode.appendChild(this);
-    })
-}
+      return pos;
+    }
+
+    //animate the markers from the position of their "parent" cluster to their actual position
+    function animateIn(d) {
+      var el = d3.select(this);
+      // check if element's "zoom" data is equal to the current zoom
+      if( d.zoom == cur_zoom ) {
+        //only animate position if we're zooming in
+        if( cur_zoom > prev_zoom ) {
+          var parent_data = clusters[cur_zoom - 1][d.parent],
+              parent_map_pos = map_pixel(parent_data.latitude, parent_data.longitude),
+              self_pos = map_pixel(d.latitude, d.longitude);
+
+          return d3.select(this).style('left', (parent_map_pos.x - padding) + 'px')
+            .style('top', (parent_map_pos.y - padding) + 'px')
+            .attr('opacity', 0)
+            .transition()
+            .duration(800)
+            .style("left", (self_pos.x - padding) + "px")
+            .style("top", (self_pos.y - padding) + "px")
+            .attr('opacity', 1);
+        } else {
+          // fade in if zooming out
+          return d3.select(this).attr('opacity', 0)
+            .transition()
+            .duration(800)
+            .attr('opacity', 1);
+        }
+      } // end zoom check. don't transition if el is not in the current zoom bucket.
+    }
+
+    // exit animation
+    // animate position of markers from current position to parent position
+    function animateOut(d) {
+      el = d3.select(this);
+
+      // check if elements "zoom" data attribute is equal to cur_zoom + 1
+      //only animate position if zooming out and the element is from one zoom level down
+      if( d.zoom == (cur_zoom+1) && cur_zoom < prev_zoom ) {
+        var parent_data = data[d.parent],
+            parent_map_pos = map_pixel(parent_data.latitude, parent_data.longitude);
+
+        return d3.select(this).transition()
+          .duration(800)
+          .style('left', (parent_map_pos.x - padding) + 'px')
+          .style('top', (parent_map_pos.y - padding) + 'px')
+          .attr('opacity', 0)
+          .each("end",function() {
+            d3.select(this).remove();
+           });
+      } else if(d.zoom == (cur_zoom-1) && cur_zoom > prev_zoom ) {
+        // if zooming in and element is from one zoom level up, fade out opacity
+        console.log("removing element during zoom in");
+        return d3.select(this).transition()
+          .delay(400)
+          .duration(400)
+          .attr('opacity', 0)
+          .each("end",function() {
+            d3.select(this).remove();
+           });
+      } else {
+        // if element is not from the immediately preceding zoom level, remove immediately
+        console.log("remove immediately");
+        return d3.select(this).remove();
+      }
+    }
+
+  };
+};
+
+// Bind overlay to the map…
+overlay.setMap(map);
+});

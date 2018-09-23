@@ -2,7 +2,10 @@ import {database, auth, provider, persistance} from '../firebase-init'
 import {
   ADD_NOTE,
   LOGGED_IN_SUCCESSFULLY,
-  NOT_LOGGED_IN
+  NOT_LOGGED_IN,
+  RECEIVE_NOTES,
+  FAILED_UPLOAD,
+  SUCCESSFUL_UPLOAD
 } from './actions'
 
 export const addNote = (latitude, longitude) => dispatch => {
@@ -11,6 +14,45 @@ export const addNote = (latitude, longitude) => dispatch => {
     payload: { latitude, longitude }
   })
 }
+
+export const uploadNote = (dispatch, title, description, link, nextPostValue) => {
+  const id = database.ref().child('posts').push().key
+  const updates = {};
+  updates['/posts/' + id] = {
+    title, description, link, id,
+    display: true,
+    date: new Date().toString().slice(4,15),
+    order: nextPostValue
+  }
+  database.ref().update(updates, (error) => {
+    if(error) {
+      dispatch({
+        type: FAILED_UPLOAD
+      })
+    } else {
+      dispatch({
+        type: SUCCESSFUL_UPLOAD
+      })
+    }
+  })
+}
+
+
+export const fetchPosts = (dispatch) => {
+  database.ref('posts/').on('value', snapshot => {
+    const posts =  snapshot.val()
+    dispatch({
+      type: RECEIVE_NOTES,
+      payload: posts? Object.keys(posts).map(e => posts[e]) : []
+    })
+  })
+}
+
+
+
+
+
+
 
 export const logIn = () => (dispatch, getState) => {
   auth.setPersistence(persistance.SESSION).then(() =>
@@ -23,7 +65,7 @@ export const logOut = (dispatch) => {
     dispatch({
       type: NOT_LOGGED_IN
     })
-  }).catch(function(error) {
+  }).catch((error) => {
     console.log('Sign-out error!!')
   })
 }

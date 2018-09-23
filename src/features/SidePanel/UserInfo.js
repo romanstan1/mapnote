@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import {connect} from 'react-redux'
 import {logOut} from 'store/modules/action-creators'
-import './Settings.css'
+import './UserInfo.css'
 
 const SettingIcon = () =>
   <svg width="20" height="20" viewBox="0 0 20 20">
@@ -23,7 +23,8 @@ const UserInfo = ({user, handleLogOut}) =>  {
     <Fragment>
       <Settings handleLogOut={handleLogOut}/>
       <div className="UserInfo">
-        {user.displayName}
+        <div className='image-wrap'><img src={user.photoURL} alt=""/></div>
+        <div className='display-name'> {user.displayName}</div>
       </div>
     </Fragment>
   )
